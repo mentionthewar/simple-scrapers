@@ -10,9 +10,9 @@ import urllib.request
 import time
 
 count = 0
-pageid = 251 # first viable ID
+pageid = 1504 # first viable ID
 
-while count < 100:
+while count < 2000:
     url_number = str(pageid)
     url = "http://www.visitukheritage.gov.uk/servlet/com.eds.ir.cto.servlet.CtoDetailServlet?ID="
     full_url = url + url_number
@@ -42,7 +42,7 @@ while count < 100:
 
     # Choose where in the document to start
         startLoc = pageContents.find('Unique ID:')
-        endLoc = pageContents.find('Items</a>')
+        endLoc = pageContents.find('Home')
         pageContents = pageContents[startLoc:endLoc]
  
         inside = 0
@@ -61,38 +61,32 @@ while count < 100:
         return text
 
 # Replace dots with commas (for CSV)
-    print("Adjusting for CSV...")
+    print("Removing blank lines and headers...")
     
     new_text = (stripTags(pageContents))
-    # new_text = new_text.strip(' \t\n\r') # remove whitespace
-    # this doesn't work properly
-    # all spaces between ; delimeters need to be removed
+    new_text = new_text.replace('\n', '') # remove whitespace
 
-# Remove headings
-    new_text = new_text.replace('Unique ID:', '')
-    new_text = new_text.replace('Category:', ';')
-    new_text = new_text.replace('Access Details:', ';')
-    new_text = new_text.replace('Contact Name:', ';')
-    new_text = new_text.replace('Contact Address:', ';')
-    new_text = new_text.replace('Contact Reference:', ';')
-    new_text = new_text.replace('Telephone No:', ';')
-    new_text = new_text.replace('Fax Number:', ';')
-    new_text = new_text.replace('Email:', ';')
-    new_text = new_text.replace('Description:', ';')
-    new_text = new_text.replace('Web Site(s):', ';')
-    new_text = new_text.replace('\n', '')
-    new_text = new_text.replace('Other Linked Exempt', '\n')
+# Convert headings to row and column spacing
+# Hash is used as a delimiter because it does occur in the data
+
+    new_text = new_text.replace('Unique ID:', '\n')
+    new_text = new_text.replace('Category:', '#')
+    new_text = new_text.replace('Access Details:', '#')
+    new_text = new_text.replace('Contact Name:', '#')
+    new_text = new_text.replace('Contact Address:', '#')
+    new_text = new_text.replace('Contact Reference:', '#')
+    new_text = new_text.replace('Telephone No:', '#')
+    new_text = new_text.replace('Fax Number:', '#')
+    new_text = new_text.replace('Email:', '#')
+    new_text = new_text.replace('Description:', '#')
+    new_text = new_text.replace('Web Site(s):', '#')
+    new_text = new_text.replace('Other Linked Exempt Items', '')  
 
 # Output new content to a file
 
     print("\nAdding to file...")
 
-    output_file = open("art3.txt", "a") # a for append, w for write
-
-    #Move this out of the loop
-    #output_file.write("Unique ID;Category;Access Details;Contact Name;Contact Address;"+
-                    #  "Contact Reference;Telephone Number;Fax Number;Telephone No;Email;"+
-                    #  "Description;Web Site(s)")
+    output_file = open("art4.txt", "a") # a for append, w for write
                     
     output_file.write(new_text)
     output_file.close()
@@ -102,7 +96,7 @@ while count < 100:
 
     print("\n",count, "items saved successfully.\n")
 
-    time.sleep(1.2)
+    time.sleep(0.5)
 
 
 print ("\nAll operations completed")
